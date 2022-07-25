@@ -7,7 +7,7 @@ import net.md_5.bungee.api.event.PluginMessageEvent
 import taboolib.common.platform.Plugin
 import taboolib.common.platform.event.SubscribeEvent
 import taboolib.common.platform.function.info
-import java.util.*
+import java.util.UUID
 
 object MagiciteBungee : Plugin() {
 
