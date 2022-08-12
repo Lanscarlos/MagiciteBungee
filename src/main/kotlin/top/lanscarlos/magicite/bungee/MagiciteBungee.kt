@@ -20,17 +20,21 @@ object MagiciteBungee : Plugin() {
         if (e.tag != "BungeeCord") return
         val data = ByteStreams.newDataInput(e.data)
         val sub = data.readUTF()
+        info("检测到来自客户端的信息 -> $sub")
         when (sub) {
             "magicite:warp" -> {
                 val serverName = data.readUTF()
                 val uuid = UUID.fromString(data.readUTF())
                 val id = data.readUTF()
+                info("正在解析跨服信息 {server=$serverName, uuid=$uuid, id=$id}")
 
                 // 将玩家传送至目标服务器
                 val player = BungeeCord.getInstance().getPlayer(uuid)
+                info("目标玩家 ${player.name} 所在服务器：${player.server.info.name}")
                 if (player.server.info.name != serverName) {
                     val server = ProxyServer.getInstance().getServerInfo(serverName) ?: error("warp: 未知的目标服务器！")
                     player.connect(server)
+                    info("正在尝试将玩家 ${player.name} 传送至目标服务器 ${server.name}")
                 }
 
                 // 向目标服务器发送数据
@@ -38,8 +42,10 @@ object MagiciteBungee : Plugin() {
                     it.writeUTF("magicite:warp")
                     it.writeUTF(uuid.toString())
                     it.writeUTF(id)
-                }
-                ProxyServer.getInstance().getServerInfo(serverName)?.sendData("BungeeCord", output.toByteArray())
+                }.toByteArray()
+                info("正在构建跨服信息 -> ${String(output)}")
+                ProxyServer.getInstance().getServerInfo(serverName)?.sendData("BungeeCord", output)
+                info("跨服信息已发送...")
             }
         }
     }
