@@ -20,8 +20,17 @@ object MagiciteBungee : Plugin() {
         if (e.tag != "BungeeCord") return
         val data = ByteStreams.newDataInput(e.data)
         val sub = data.readUTF()
-        info("检测到来自客户端的信息 -> $sub")
         when (sub) {
+            "magicite:cmd" -> {
+                val cmd = data.readUTF()
+                BungeeCord.getInstance().servers.values.forEach { server ->
+                    val output = ByteStreams.newDataOutput().also {
+                        it.writeUTF("magicite:cmd")
+                        it.writeUTF(cmd)
+                    }.toByteArray()
+                    server.sendData("BungeeCord", output)
+                }
+            }
             "magicite:warp" -> {
                 val serverName = data.readUTF()
                 val uuid = UUID.fromString(data.readUTF())
