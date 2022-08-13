@@ -19,15 +19,16 @@ object MagiciteBungee : Plugin() {
     fun e(e: PluginMessageEvent) {
         if (e.tag != "BungeeCord") return
         val data = ByteStreams.newDataInput(e.data)
-        val sub = data.readUTF()
-        when (sub) {
+        when (data.readUTF()) {
             "magicite:cmd" -> {
                 val cmd = data.readUTF()
+                info("正在解析跨服命令: $cmd")
+                val output = ByteStreams.newDataOutput().also {
+                    it.writeUTF("magicite:cmd")
+                    it.writeUTF(cmd)
+                }.toByteArray()
                 BungeeCord.getInstance().servers.values.forEach { server ->
-                    val output = ByteStreams.newDataOutput().also {
-                        it.writeUTF("magicite:cmd")
-                        it.writeUTF(cmd)
-                    }.toByteArray()
+                    info("正在向服务器 ${server.name} 发送跨服命令: $cmd")
                     server.sendData("BungeeCord", output)
                 }
             }
